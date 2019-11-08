@@ -3,7 +3,7 @@ document.onload = (function(d3, saveAs, Blob, undefined){
 
   // TODO add user settings
   var consts = {
-    defaultTitle: "random variable"
+    defaultTitle: "Nodo"
   };
   var settings = {
     appendElSpec: "#graph"
@@ -315,6 +315,48 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     }
   };
 
+  
+  /* place editable text on node in place of svg text */
+  GraphCreator.prototype.changeTextOfPath = function(d3node, d,event){
+    var thisGraph= this,
+        consts = thisGraph.consts,
+        htmlEl = d3node.node();
+    d3node.selectAll("text").remove();
+    // replace with editableconent text
+    var d3txt = thisGraph.svg.selectAll("foreignObject")
+          .data([d])
+          .enter()
+          .append("foreignObject")
+		  .attr("id","foreign"+d.id)
+          .attr("x", event.clientX )
+          .attr("y", event.clientY)
+          .attr("height", 100)
+          .attr("width", 200)
+          .append("xhtml:p")
+          .attr("id", consts.activeEditId)
+          .attr("contentEditable", "true")
+          .text(d.title)
+          .on("mousedown", function(d){
+            d3.event.stopPropagation();
+          })
+          .on("keydown", function(d){
+            d3.event.stopPropagation();
+            if (d3.event.keyCode == consts.ENTER_KEY && !d3.event.shiftKey){
+              this.blur();
+            }
+          })
+          .on("blur", function(d){
+            d.title = this.textContent;
+            thisGraph.insertTitleLinebreaks(d3node, d.title);
+			var textPathId = d.id.replace("foreign","");
+			$("#"+textPathId).text(d.title).show();
+			
+			console.log(d.title);
+            d3.select(this.parentElement).remove();
+          });
+    return d3txt;
+  };
+  
   /* place editable text on node in place of svg text */
   GraphCreator.prototype.changeTextOfNode = function(d3node, d){
     var thisGraph= this,
@@ -505,6 +547,12 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     // add new paths
     paths.enter()
       .append("path")
+	  .attr("id",function(d){
+		  var lastArrowId = parseInt(sessionStorage.getItem("lastArrowId"));
+		  var newId = lastArrowId + 1;
+		  sessionStorage.setItem("lastArrowId", newId);
+		  return "path" + newId;
+	  })
       .style('marker-end','url(#end-arrow)')
       .classed("link", true)
       .attr("d", function(d){
@@ -516,7 +564,35 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       )
       .on("mouseup", function(d){
         state.mouseDownLink = null;
-      });
+      })
+	  .on("dblclick",function(d){
+		  var id = $(this).attr("id")
+		  var text = $(document.createElementNS("http://www.w3.org/2000/svg","text"))
+		  .attr("contentEditable","true")
+		  .attr("font-family","Verdana")
+		  .attr("id","text" +id)
+		  .attr("x","100")
+		  .attr("y","100")
+		  .attr("margin-bottom","100")
+		  .get(0);
+		  var textPath = $(document.createElementNS("http://www.w3.org/2000/svg","textPath"))
+		  .addClass("pathTextReference")
+		  .attr("id",'textPath'+id)
+		  .attr("href","#"+id)
+		  .attr("margin-bottom","100")
+		  .text("Peso de arista")
+		  .on("click",function(e){
+					$(this).hide();
+				  var d3txt = thisGraph.changeTextOfPath(d3.select(this), e.target,e);
+				  var txtNode = d3txt.node();
+				  thisGraph.selectElementContents(txtNode);
+				  txtNode.focus();
+		  })
+		  .get(0);
+		  document.getElementsByTagName("svg")[0].appendChild(text);
+		  document.getElementById("text"+id).appendChild(textPath);
+		  return;
+	  });
 
     // remove old links
     paths.exit().remove();

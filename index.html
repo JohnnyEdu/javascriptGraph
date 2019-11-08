@@ -1,19 +1,66 @@
 <!DOCTYPE HTML>
 <html>
   <head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="graph-creator.css" />
   </head>
 
   <body>
     <div id="graph">
-    <div id="toolbox">
-      <input type="file" id="hidden-file-upload"><input id="upload-input" type="image" title="upload graph" src="upload-icon.png" alt="upload graph"> <input type="image" id="download-input" title="download graph" src="download-icon.png" alt="download graph"> <input type="image" id="delete-graph" title="delete graph" src="trash-icon.png" alt="delete graph">
     </div>
-    </div>
-
+	<div id="toolbox">
+		<a id="enviarGrafo" href="#" class="btn blue" >Guardar mapa</a>
+	</div>
     <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
     <script src="http://cdn.jsdelivr.net/filesaver.js/0.1/FileSaver.min.js"></script>
     <script src="graph-creator.js"></script>
+	
+	 <script type="text/javascript">
+		$(window).resize(function() {
+			$("svg").attr("width",  window.innerWidth);
+			$("svg").attr("height", window.innerHeight);
+		});
+		
+		$(document).ready(function(){
+			$("#enviarGrafo").click(function(e){
+				var jsonNodos = getNodos();
+				var jsonAristas = getAristas();
+				console.log(jsonNodos);
+				console.log(jsonAristas);
+			});
+			
+		});
+		
+		function getAristas(){
+			var aristas = $("path.link");
+			var jsonAristas = "[";
+			var aristasSize = aristas.length;
+			aristas.each(function(index){
+				jsonAristas += '{"peso":' + '"' + $(this).text() + '"}';  
+				if(index != (aristasSize - 1)){
+					jsonAristas += ","; 
+				}
+			});
+			jsonAristas += "]";
+			return jsonAristas;
+		}
+		function getNodos(){
+			var nodos = $(".conceptG");
+			var jsonNodos = "[";
+			var nodosSize = nodos.length;
+			nodos.each(function(index){
+				jsonNodos += '{"label":' + '"' + $(this).text() + '"}';  
+				if(index != (nodosSize - 1)){
+					jsonNodos += ","; 
+				}
+			});
+			jsonNodos += "]";
+			return jsonNodos;
+		}
+		sessionStorage.setItem("lastArrowId", 0);
+	 </script>
+	
   </body>
 
 </html>
