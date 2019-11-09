@@ -1,3 +1,5 @@
+var aristas;
+var nodos;
 document.onload = (function(d3, saveAs, Blob, undefined){
   "use strict";
 
@@ -118,11 +120,15 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     // handle download data
     d3.select("#download-input").on("click", function(){
       var saveEdges = [];
-      thisGraph.edges.forEach(function(val, i){
-        saveEdges.push({source: val.source.id, target: val.target.id});
+      thisGraph.paths[0].forEach(function(path, i){
+        var val = path.__data__;
+        var weight = $("#"+"textPath"+path.id).text();
+        saveEdges.push({source: val.source.title, target: val.target.title, weight: weight});
       });
-      var blob = new Blob([window.JSON.stringify({"nodes": thisGraph.nodes, "edges": saveEdges})], {type: "text/plain;charset=utf-8"});
-      saveAs(blob, "mydag.json");
+      //var blob = new Blob([window.JSON.stringify({"nodes": thisGraph.nodes, "edges": saveEdges})], {type: "text/plain;charset=utf-8"});
+      var json = window.JSON.stringify({"nodes": thisGraph.nodes, "edges": saveEdges});
+      console.log(json);
+      //saveAs(blob, "mydag.json");
     });
 
 
@@ -351,7 +357,6 @@ document.onload = (function(d3, saveAs, Blob, undefined){
 			var textPathId = d.id.replace("foreign","");
 			$("#"+textPathId).text(d.title).show();
 			
-			console.log(d.title);
             d3.select(this.parentElement).remove();
           });
     return d3txt;
@@ -559,41 +564,39 @@ document.onload = (function(d3, saveAs, Blob, undefined){
         return "M" + d.source.x + "," + d.source.y + "L" + d.target.x + "," + d.target.y;
       })
       .on("mousedown", function(d){
-        thisGraph.pathMouseDown.call(thisGraph, d3.select(this), d);
+
+        var id = $(this).attr("id")
+        var text = $(document.createElementNS("http://www.w3.org/2000/svg","text"))
+        .attr("contentEditable","true")
+        .attr("font-family","Verdana")
+        .attr("id","text" +id)
+        .attr("x","100")
+        .attr("y","100")
+        .attr("margin-bottom","100")
+        .get(0);
+        var textPath = $(document.createElementNS("http://www.w3.org/2000/svg","textPath"))
+        .addClass("pathTextReference")
+        .attr("id",'textPath'+id)
+        .attr("href","#"+id)
+        .attr("margin-bottom","100")
+        .text("Peso")
+        .on("click",function(e){
+            $(this).hide();
+            var d3txt = thisGraph.changeTextOfPath(d3.select(this), e.target,e);
+            var txtNode = d3txt.node();
+            thisGraph.selectElementContents(txtNode);
+            txtNode.focus();
+        })
+        .get(0);
+        document.getElementsByTagName("svg")[0].appendChild(text);
+        document.getElementById("text"+id).appendChild(textPath);
+
+        thisGraph.pathMouseDown.call(thisGraph, d3.select(this), d);        
         }
       )
       .on("mouseup", function(d){
         state.mouseDownLink = null;
-      })
-	  .on("dblclick",function(d){
-		  var id = $(this).attr("id")
-		  var text = $(document.createElementNS("http://www.w3.org/2000/svg","text"))
-		  .attr("contentEditable","true")
-		  .attr("font-family","Verdana")
-		  .attr("id","text" +id)
-		  .attr("x","100")
-		  .attr("y","100")
-		  .attr("margin-bottom","100")
-		  .get(0);
-		  var textPath = $(document.createElementNS("http://www.w3.org/2000/svg","textPath"))
-		  .addClass("pathTextReference")
-		  .attr("id",'textPath'+id)
-		  .attr("href","#"+id)
-		  .attr("margin-bottom","100")
-		  .text("Peso de arista")
-		  .on("click",function(e){
-					$(this).hide();
-				  var d3txt = thisGraph.changeTextOfPath(d3.select(this), e.target,e);
-				  var txtNode = d3txt.node();
-				  thisGraph.selectElementContents(txtNode);
-				  txtNode.focus();
-		  })
-		  .get(0);
-		  document.getElementsByTagName("svg")[0].appendChild(text);
-		  document.getElementById("text"+id).appendChild(textPath);
-		  return;
-	  });
-
+      });
     // remove old links
     paths.exit().remove();
 
@@ -601,6 +604,8 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     thisGraph.circles = thisGraph.circles.data(thisGraph.nodes, function(d){ return d.id;});
     thisGraph.circles.attr("transform", function(d){return "translate(" + d.x + "," + d.y + ")";});
 
+
+    aristas = paths.enter()[0].update;
     // add new nodes
     var newGs= thisGraph.circles.enter()
           .append("g");
@@ -632,6 +637,8 @@ document.onload = (function(d3, saveAs, Blob, undefined){
 
     // remove old nodes
     thisGraph.circles.exit().remove();
+    nodos = thisGraph.circles[0];
+
   };
 
   GraphCreator.prototype.zoomed = function(){

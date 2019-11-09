@@ -24,3 +24,14 @@
 .blue:hover {
   background-color: #6FC6FF;
 }
+
+.menuGuia{
+        background-color: white;
+        border: 1px solid black;
+        margin-bottom:10px;
+      }
+
+ul{
+  list-style: none;
+  padding-left: 10px;
+}

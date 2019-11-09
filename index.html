@@ -7,10 +7,22 @@
   </head>
 
   <body>
+  	<div style="display:inline;width:20%;/* margin-top: 20%; */position: fixed;top: 20%;">
+        <ul>
+            <li class="menuGuia"><strong>SHIFT + CLICK</strong> para añadir un nodo</li>
+            <li class="menuGuia"><strong>SHIFT + CLICK</strong> en nodo para cambiar texto</li>
+            
+            <li class="menuGuia"><strong>CLICK + DELETE</strong> para borrar un elemento</li>
+            <li class="menuGuia"><strong>SHIFT + MOUSE</strong> de nodo a nodo para conectar con arista</li>
+            <li class="menuGuia"><strong>DOBLE CLICK</strong> en arista para cambiar peso</li>
+            <li class="menuGuia"><strong>CLICK + MOUSE</strong> mover mapa</li
+
+        </ul>
+    </div>    
     <div id="graph">
     </div>
 	<div id="toolbox">
-		<a id="enviarGrafo" href="#" class="btn blue" >Guardar mapa</a>
+		<a id="download-input" href="#" class="btn blue" >Guardar mapa</a>
 	</div>
     <script src="d3.v3.js" charset="utf-8"></script>
     <script src="graph-creator.js"></script>
@@ -21,42 +33,6 @@
 			$("svg").attr("height", window.innerHeight);
 		});
 		
-		$(document).ready(function(){
-			$("#enviarGrafo").click(function(e){
-				var jsonNodos = getNodos();
-				var jsonAristas = getAristas();
-				console.log(jsonNodos);
-				console.log(jsonAristas);
-			});
-			
-		});
-		
-		function getAristas(){
-			var aristas = $("path.link");
-			var jsonAristas = "[";
-			var aristasSize = aristas.length;
-			aristas.each(function(index){
-				jsonAristas += '{"peso":' + '"' + $(this).text() + '"}';  
-				if(index != (aristasSize - 1)){
-					jsonAristas += ","; 
-				}
-			});
-			jsonAristas += "]";
-			return jsonAristas;
-		}
-		function getNodos(){
-			var nodos = $(".conceptG");
-			var jsonNodos = "[";
-			var nodosSize = nodos.length;
-			nodos.each(function(index){
-				jsonNodos += '{"label":' + '"' + $(this).text() + '"}';  
-				if(index != (nodosSize - 1)){
-					jsonNodos += ","; 
-				}
-			});
-			jsonNodos += "]";
-			return jsonNodos;
-		}
 		sessionStorage.setItem("lastArrowId", 0);
 	 </script>
 	
