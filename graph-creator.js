@@ -1,5 +1,6 @@
 var aristas;
 var nodos;
+var spefiedReload=false;
 document.onload = (function(d3, saveAs, Blob, undefined){
   "use strict";
 
@@ -131,6 +132,11 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       //saveAs(blob, "mydag.json");
     });
 
+
+    d3.select("#clear-map").on("click",function(){
+        spefiedReload = true;
+        location.reload();
+    });
 
     // handle uploaded data
     d3.select("#upload-input").on("click", function(){
@@ -670,7 +676,9 @@ document.onload = (function(d3, saveAs, Blob, undefined){
 
   // warn the user when leaving
   window.onbeforeunload = function(){
-    return "Make sure to save your graph locally before leaving :-)";
+    if(spefiedReload){
+      return "Si sale, el mapa se perderá";  
+    }
   };
 
   var docEl = document.documentElement,
@@ -678,6 +686,7 @@ document.onload = (function(d3, saveAs, Blob, undefined){
 
   var width = window.innerWidth || docEl.clientWidth || bodyEl.clientWidth,
       height =  window.innerHeight|| docEl.clientHeight|| bodyEl.clientHeight;
+
 
   var xLoc = width/2 - 25,
       yLoc = 100;
@@ -690,8 +699,13 @@ document.onload = (function(d3, saveAs, Blob, undefined){
   /** MAIN SVG **/
   var svg = d3.select(settings.appendElSpec).append("svg")
         .attr("width", width)
-        .attr("height", height);
+        .attr("height", height)
+        .attr("style","background-color: #e6e6e6;");
   var graph = new GraphCreator(svg, nodes, edges);
       graph.setIdCt(2);
   graph.updateGraph();
 })(window.d3, window.saveAs, window.Blob);
+
+function init(){
+
+}

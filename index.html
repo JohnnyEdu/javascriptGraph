@@ -7,10 +7,11 @@
   </head>
 
   <body>
-  	<div style="display:inline;width:20%;/* margin-top: 20%; */position: fixed;top: 20%;">
+  	<div style="display:inline;width:20%;background-color: white;height: 100%;position:fixed;">
         <ul>
+        	<li class="menuGuia"><strong>CLICK</strong> sobre arista para añadir un peso</li>
             <li class="menuGuia"><strong>SHIFT + CLICK</strong> para añadir un nodo</li>
-            <li class="menuGuia"><strong>SHIFT + CLICK</strong> en nodo para cambiar texto</li>
+            <li class="menuGuia"><strong>SHIFT + CLICK</strong> sobre nodo para cambiar texto</li>
             
             <li class="menuGuia"><strong>CLICK + DELETE</strong> para borrar un elemento</li>
             <li class="menuGuia"><strong>SHIFT + MOUSE</strong> de nodo a nodo para conectar con arista</li>
@@ -23,16 +24,17 @@
     </div>
 	<div id="toolbox">
 		<a id="download-input" href="#" class="btn blue" >Guardar mapa</a>
+		<a id="clear-map" href="#" class="btn blue" >Reinciar</a>
 	</div>
     <script src="d3.v3.js" charset="utf-8"></script>
     <script src="graph-creator.js"></script>
 	
 	 <script type="text/javascript">
-		$(window).resize(function() {
+	/*	$(window).resize(function() {
 			$("svg").attr("width",  window.innerWidth);
 			$("svg").attr("height", window.innerHeight);
 		});
-		
+	*/	
 		sessionStorage.setItem("lastArrowId", 0);
 	 </script>
 	

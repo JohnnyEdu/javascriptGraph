@@ -1,4 +1,7 @@
 /* start da css for da buttons */
+body{
+      font-family: sans-serif;
+}
 .btn {
   border-radius: 5px;
   padding: 15px 25px;
@@ -34,4 +37,10 @@
 ul{
   list-style: none;
   padding-left: 10px;
+  position:fixed; 
+  top:20%;
+  width: 19%;
+}
+li{
+  padding: 10px;
 }
