@@ -333,7 +333,7 @@ document.onload = (function(d3, saveAs, Blob, undefined){
           .data([d])
           .enter()
           .append("foreignObject")
-		  .attr("id","foreign"+d.id)
+		      .attr("id","foreign"+d.id)
           .attr("x", event.clientX )
           .attr("y", event.clientY)
           .attr("height", 100)
@@ -354,9 +354,12 @@ document.onload = (function(d3, saveAs, Blob, undefined){
           .on("blur", function(d){
             d.title = this.textContent;
             thisGraph.insertTitleLinebreaks(d3node, d.title);
-			var textPathId = d.id.replace("foreign","");
-			$("#"+textPathId).text(d.title).show();
-			
+			       var textPathId = d.id.replace("foreign","");
+             var theTextPath = $("#"+textPathId);
+             if(d.title != undefined && d.title != ""){
+                theTextPath.text(d.title);
+             }
+			       theTextPath.show();
             d3.select(this.parentElement).remove();
           });
     return d3txt;
@@ -566,20 +569,24 @@ document.onload = (function(d3, saveAs, Blob, undefined){
       .on("mousedown", function(d){
 
         var id = $(this).attr("id")
-        var text = $(document.createElementNS("http://www.w3.org/2000/svg","text"))
+        var existsTextPath = $("#textPath"+id).length > 0;
+        if(!existsTextPath){
+            var text = $(document.createElementNS("http://www.w3.org/2000/svg","text"))
         .attr("contentEditable","true")
         .attr("font-family","Verdana")
+        .attr("font-size","1em")
         .attr("id","text" +id)
         .attr("x","100")
         .attr("y","100")
         .attr("margin-bottom","100")
+        .addClass("pathTextReferenceContainer")
         .get(0);
         var textPath = $(document.createElementNS("http://www.w3.org/2000/svg","textPath"))
         .addClass("pathTextReference")
         .attr("id",'textPath'+id)
         .attr("href","#"+id)
         .attr("margin-bottom","100")
-        .text("Peso")
+        .text("1")
         .on("click",function(e){
             $(this).hide();
             var d3txt = thisGraph.changeTextOfPath(d3.select(this), e.target,e);
@@ -591,6 +598,7 @@ document.onload = (function(d3, saveAs, Blob, undefined){
         document.getElementsByTagName("svg")[0].appendChild(text);
         document.getElementById("text"+id).appendChild(textPath);
 
+        }
         thisGraph.pathMouseDown.call(thisGraph, d3.select(this), d);        
         }
       )
@@ -645,6 +653,7 @@ document.onload = (function(d3, saveAs, Blob, undefined){
     this.state.justScaleTransGraph = true;
     d3.select("." + this.consts.graphClass)
       .attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
+    $(".pathTextReferenceContainer").attr("transform", "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
   };
 
   GraphCreator.prototype.updateWindow = function(svg){
